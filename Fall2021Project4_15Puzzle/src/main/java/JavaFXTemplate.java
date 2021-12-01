@@ -33,7 +33,7 @@ public class JavaFXTemplate extends Application {
 	HashMap<String, Scene> sceneMap; 
 	Button A_StarBtn, leftBtn, rightBtn, upBtn, downBtn;
 	GameButton button;
-	int i = 0;// index = 0, leftIndex = 0, rightIndex = 0, upIndex = 0, downIndex = 0, tempIndex = 0;
+	int i = 0;
 	int[] myPuzzle;
 	PauseTransition pause;
 	Stage myStage;
@@ -130,13 +130,14 @@ public class JavaFXTemplate extends Application {
 					int downIndex = index + 4;
 					int tempIndex = 0;
 					
-					// Check each direction to see if the value is 0 upon being clicked and 
+					// Check each direction to see if the adjacent value is 0 upon being clicked and 
 					// swap the values and update the gameboard if one of the conditions satisfy
 					if((downIndex < 16 && downIndex >= 0) && myInterface.puzzle[downIndex] == 0) {
 						tempIndex = myInterface.puzzle[index];
 						myInterface.puzzle[index] = myInterface.puzzle[downIndex]; 
 						myInterface.puzzle[downIndex] = tempIndex;
 						button.setText(Integer.toString(button.puzzleVal));
+						// Print statements to help debug
 						System.out.println("Down");
 						System.out.println(myInterface.puzzle[downIndex]);
 						System.out.println();
@@ -146,6 +147,7 @@ public class JavaFXTemplate extends Application {
 						myInterface.puzzle[index] = myInterface.puzzle[rightIndex]; 
 						myInterface.puzzle[rightIndex] = tempIndex;
 						button.setText(Integer.toString(button.puzzleVal));
+						// Print statements to help debug
 						System.out.println("Right");
 						System.out.println(myInterface.puzzle[rightIndex]);
 						System.out.println();
@@ -155,6 +157,7 @@ public class JavaFXTemplate extends Application {
 						myInterface.puzzle[index] = myInterface.puzzle[upIndex]; 
 						myInterface.puzzle[upIndex] = tempIndex;
 						button.setText(Integer.toString(button.puzzleVal));
+						// Print statements to help debug
 						System.out.println("Up");
 						System.out.println(myInterface.puzzle[upIndex]);
 						System.out.println();
@@ -164,6 +167,7 @@ public class JavaFXTemplate extends Application {
 						myInterface.puzzle[index] = myInterface.puzzle[leftIndex]; 
 						myInterface.puzzle[leftIndex] = tempIndex;
 						button.setText(Integer.toString(button.puzzleVal));
+						// Print statements to help debug
 						System.out.println("Left");
 						System.out.println(myInterface.puzzle[leftIndex]);
 						System.out.println();

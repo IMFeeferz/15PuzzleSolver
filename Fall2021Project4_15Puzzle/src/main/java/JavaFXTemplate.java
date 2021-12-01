@@ -24,29 +24,29 @@ import javafx.stage.Stage;
 public class JavaFXTemplate extends Application {
 	
 	ListView<String> displayQueueItems;
-	MenuItem menu_item;
-	Menu playBtn, themeBtn, optionBtn;
 	MenuBar menu_bar;
-	GridPane gameboard;
+	GridPane gameboard, nextBoard;
 	BorderPane startPane;
 	TextField textField;
 	ListView<String> displayItems;
 	ObservableList<String> storeQueueItemsInListView;
 	HashMap<String, Scene> sceneMap; 
-	Button A_Star_Button;
-	int curPlayer, curTurn, i = 0;
+	Button A_StarBtn, leftBtn, rightBtn, upBtn, downBtn;
+	GameButton button;
+	int i = 0;// index = 0, leftIndex = 0, rightIndex = 0, upIndex = 0, downIndex = 0, tempIndex = 0;
 	int[] myPuzzle;
 	PauseTransition pause;
 	Stage myStage;
 	Scene startScene;
 	
+	// Objects for the 15 puzzle project
 	Node myNode;
 	UserInterface myInterface;
 	DB_Solver2 DBSolver;
 	A_IDS_A_15solver mySolver;
 	
 	ArrayList<Integer> values = new ArrayList<>(Arrays.asList(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15));
-	ArrayList<ArrayList<Integer>> valuesArray = new ArrayList<ArrayList<Integer>>();;
+	//ArrayList<ArrayList<Integer>> valuesArray = new ArrayList<ArrayList<Integer>>();;
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
@@ -60,16 +60,22 @@ public class JavaFXTemplate extends Application {
 		primaryStage.setTitle("15 Puzzle Solver");
 		Collections.shuffle(values);
 		myPuzzle = new int[16];
+		myInterface = new UserInterface();
 		
+		//myInterface objects collects the values from the arrayList after it gets shuffled
 		for(int i = 0; i < values.size(); i++) {
-			myPuzzle[i] = values.get(i);
+			myInterface.puzzle[i] = values.get(i);
 		}
 		
 		myStage = primaryStage;
 		gameboard = new GridPane();
+		nextBoard = new GridPane();
 		startPane = new BorderPane();
-		myInterface = new UserInterface();
-		A_Star_Button = new Button("A_Star");
+		A_StarBtn = new Button("A_Star");
+		leftBtn = new Button("Left");
+		rightBtn = new Button("Right");
+		upBtn = new Button("Up");
+		downBtn = new Button("Down");
 //		mySolver = new A_IDS_A_15solver();
 		myNode = new Node(myInterface.puzzle);
 		DBSolver = new DB_Solver2(myNode, "Heuristic");
@@ -93,27 +99,101 @@ public class JavaFXTemplate extends Application {
 //			myPuzzle = puzzle.stringToIntArray(values.get(i));
 //		}
 //		myPuzzle = puzzle.getPuzzle();
-		for(int col = 0; col < 4; col++) {
-			for(int row = 0; row < 4; row++) {
-				GameButton button = new GameButton(row, col, myInterface.puzzle[i]);
+		
+		// Generate the puzzle
+		for(int row = 0; row < 4; row++) {
+			for(int col = 0; col < 4; col++) {
+				//Assign the buttons based on their respective rows, columns, and values
+				button = new GameButton(col, row, myInterface.puzzle[i]);
+				//Make puzzle 0 white while the rest is colored
+				if(myInterface.puzzle[i] == 0) {
+					button.setStyle("-fx-background-color: white");
+					button.setText(" ");
+				}
+				else {
+					button.setStyle("-fx-background-color: magenta");
+					button.setText(Integer.toString(button.puzzleVal));
+				}
 				i++;
-				button.setStyle("-fx-background-color: grey");
-				button.setText(Integer.toString(button.puzzleVal));
+				button.setOnAction(e->{
+					// b carries the current button object being clicked
+					GameButton b = (GameButton) e.getSource();
+					//Assign indexes
+					int index = (4*b.row)+b.col;
+					int leftIndex = index - 1;
+					int rightIndex = index + 1;
+					int upIndex = index - 4;
+					int downIndex = index + 4;
+					int tempIndex = 0;
+					// Check each direction to see if the value is 0 upon being clicked and 
+					// swap the values and update the gameboard if one of the conditions satisfy
+					if((downIndex < 16 && downIndex >= 0) && myInterface.puzzle[downIndex] == 0) {
+						tempIndex = myInterface.puzzle[index]; // out of bounds
+						myInterface.puzzle[index] = myInterface.puzzle[downIndex]; 
+						myInterface.puzzle[downIndex] = tempIndex;
+						button.setText(Integer.toString(button.puzzleVal));
+						System.out.println("Down");
+						System.out.println(myInterface.puzzle[downIndex]);
+						System.out.println();
+					}
+					else if((rightIndex < 16 && rightIndex >= 0) && myInterface.puzzle[rightIndex] == 0) {
+						tempIndex = myInterface.puzzle[index];// out of bounds
+						myInterface.puzzle[index] = myInterface.puzzle[rightIndex]; 
+						myInterface.puzzle[rightIndex] = tempIndex;
+						button.setText(Integer.toString(button.puzzleVal));
+						System.out.println("Right");
+						System.out.println(myInterface.puzzle[rightIndex]);
+						System.out.println();
+					}
+					else if((upIndex < 16 && upIndex >= 0) && myInterface.puzzle[upIndex] == 0) {
+						tempIndex = myInterface.puzzle[index];// out of bounds
+						myInterface.puzzle[index] = myInterface.puzzle[upIndex]; 
+						myInterface.puzzle[upIndex] = tempIndex;
+						button.setText(Integer.toString(button.puzzleVal));
+						System.out.println("Up");
+						System.out.println(myInterface.puzzle[upIndex]);
+						System.out.println();
+					}
+					else if((leftIndex < 16 && leftIndex >= 0) && myInterface.puzzle[leftIndex] == 0) {
+						tempIndex = myInterface.puzzle[index]; // out of bounds error
+						myInterface.puzzle[index] = myInterface.puzzle[leftIndex]; 
+						myInterface.puzzle[leftIndex] = tempIndex;
+						button.setText(Integer.toString(button.puzzleVal));
+						System.out.println("Left");
+						System.out.println(myInterface.puzzle[leftIndex]);
+						System.out.println();
+					}
+					else {
+						System.out.println("Invalid move");
+					}
+					myInterface.printArray();
+				});
 	    		button.setPrefSize(70, 70);
 	    		gameboard.add(button, col, row);
 			}
 		}
-		
-		startPane.setPadding(new Insets(70));
-		startPane.setRight(A_Star_Button);
-		A_Star_Button.setPrefSize(100, 30);
-		startPane.setCenter(gameboard);
-		startScene = new Scene(startPane, 800,800);
-		
-		A_Star_Button.setOnAction(e->{
+//		for(i = 0; i < myInterface.puzzle.length; i++) {
+//			if(myInterface.puzzle[i] == 0) {
+//				index = i;
+//			}
+//		}
+//		leftIndex = index - 1;
+//		rightIndex = index + 1;
+//		upIndex = index - 4;
+//		downIndex = index + 4;
+
+		//System.out.println(+upIndex+" "+downIndex+" "+leftIndex+" "+rightIndex);
+		A_StarBtn.setOnAction(e->{
 			DBSolver.findSolutionPath();
 		});
 				
+		
+		startPane.setPadding(new Insets(70));
+		startPane.setRight(A_StarBtn);
+		A_StarBtn.setPrefSize(100, 30);
+		startPane.setCenter(gameboard);
+		startScene = new Scene(startPane, 500,500);
+		
 		//Scene scene = new Scene(new VBox(), 700,700);
 		primaryStage.setScene(startScene);
 		primaryStage.show();

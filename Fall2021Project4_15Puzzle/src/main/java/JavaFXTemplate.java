@@ -103,8 +103,10 @@ public class JavaFXTemplate extends Application {
 		// Generate the puzzle
 		for(int row = 0; row < 4; row++) {
 			for(int col = 0; col < 4; col++) {
+				
 				//Assign the buttons based on their respective rows, columns, and values
 				button = new GameButton(col, row, myInterface.puzzle[i]);
+				
 				//Make puzzle 0 white while the rest is colored
 				if(myInterface.puzzle[i] == 0) {
 					button.setStyle("-fx-background-color: white");
@@ -114,10 +116,12 @@ public class JavaFXTemplate extends Application {
 					button.setStyle("-fx-background-color: magenta");
 					button.setText(Integer.toString(button.puzzleVal));
 				}
+				
 				i++;
 				button.setOnAction(e->{
-					// b carries the current button object being clicked
+					// b carries the current GameButton object being clicked
 					GameButton b = (GameButton) e.getSource();
+					
 					//Assign indexes
 					int index = (4*b.row)+b.col;
 					int leftIndex = index - 1;
@@ -125,10 +129,11 @@ public class JavaFXTemplate extends Application {
 					int upIndex = index - 4;
 					int downIndex = index + 4;
 					int tempIndex = 0;
+					
 					// Check each direction to see if the value is 0 upon being clicked and 
 					// swap the values and update the gameboard if one of the conditions satisfy
 					if((downIndex < 16 && downIndex >= 0) && myInterface.puzzle[downIndex] == 0) {
-						tempIndex = myInterface.puzzle[index]; // out of bounds
+						tempIndex = myInterface.puzzle[index];
 						myInterface.puzzle[index] = myInterface.puzzle[downIndex]; 
 						myInterface.puzzle[downIndex] = tempIndex;
 						button.setText(Integer.toString(button.puzzleVal));
@@ -137,7 +142,7 @@ public class JavaFXTemplate extends Application {
 						System.out.println();
 					}
 					else if((rightIndex < 16 && rightIndex >= 0) && myInterface.puzzle[rightIndex] == 0) {
-						tempIndex = myInterface.puzzle[index];// out of bounds
+						tempIndex = myInterface.puzzle[index];
 						myInterface.puzzle[index] = myInterface.puzzle[rightIndex]; 
 						myInterface.puzzle[rightIndex] = tempIndex;
 						button.setText(Integer.toString(button.puzzleVal));
@@ -146,7 +151,7 @@ public class JavaFXTemplate extends Application {
 						System.out.println();
 					}
 					else if((upIndex < 16 && upIndex >= 0) && myInterface.puzzle[upIndex] == 0) {
-						tempIndex = myInterface.puzzle[index];// out of bounds
+						tempIndex = myInterface.puzzle[index];
 						myInterface.puzzle[index] = myInterface.puzzle[upIndex]; 
 						myInterface.puzzle[upIndex] = tempIndex;
 						button.setText(Integer.toString(button.puzzleVal));
@@ -155,7 +160,7 @@ public class JavaFXTemplate extends Application {
 						System.out.println();
 					}
 					else if((leftIndex < 16 && leftIndex >= 0) && myInterface.puzzle[leftIndex] == 0) {
-						tempIndex = myInterface.puzzle[index]; // out of bounds error
+						tempIndex = myInterface.puzzle[index];
 						myInterface.puzzle[index] = myInterface.puzzle[leftIndex]; 
 						myInterface.puzzle[leftIndex] = tempIndex;
 						button.setText(Integer.toString(button.puzzleVal));
@@ -166,6 +171,7 @@ public class JavaFXTemplate extends Application {
 					else {
 						System.out.println("Invalid move");
 					}
+					// Prints the array from the UserInterface object to help debug
 					myInterface.printArray();
 				});
 	    		button.setPrefSize(70, 70);
@@ -183,6 +189,8 @@ public class JavaFXTemplate extends Application {
 //		downIndex = index + 4;
 
 		//System.out.println(+upIndex+" "+downIndex+" "+leftIndex+" "+rightIndex);
+		
+		// Solves the puzzle through A_Star algorithm
 		A_StarBtn.setOnAction(e->{
 			DBSolver.findSolutionPath();
 		});

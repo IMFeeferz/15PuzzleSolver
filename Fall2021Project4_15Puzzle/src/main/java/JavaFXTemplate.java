@@ -31,7 +31,7 @@ public class JavaFXTemplate extends Application {
 	ListView<String> displayItems;
 	ObservableList<String> storeQueueItemsInListView;
 	HashMap<String, Scene> sceneMap; 
-	Button A_StarBtn, leftBtn, rightBtn, upBtn, downBtn;
+	Button A_StarBtn;
 	GameButton button;
 	int i = 0;
 	int[] myPuzzle;
@@ -69,16 +69,14 @@ public class JavaFXTemplate extends Application {
 		
 		myStage = primaryStage;
 		gameboard = new GridPane();
-		nextBoard = new GridPane();
 		startPane = new BorderPane();
 		A_StarBtn = new Button("A_Star");
-		leftBtn = new Button("Left");
-		rightBtn = new Button("Right");
-		upBtn = new Button("Up");
-		downBtn = new Button("Down");
-//		mySolver = new A_IDS_A_15solver();
+		
+		mySolver = new A_IDS_A_15solver();
 		myNode = new Node(myInterface.puzzle);
 		DBSolver = new DB_Solver2(myNode, "Heuristic");
+		
+		
 //		Node solution = DBSolver.findSolutionPath();
 //		ArrayList solutionPath = DBSolver.getSolutionPath(solution);
 		
@@ -102,8 +100,7 @@ public class JavaFXTemplate extends Application {
 		
 		// Generate the puzzle
 		for(int row = 0; row < 4; row++) {
-			for(int col = 0; col < 4; col++) {
-				
+			for(int col = 0; col < 4; col++) {	
 				//Assign the buttons based on their respective rows, columns, and values
 				button = new GameButton(col, row, myInterface.puzzle[i]);
 				
@@ -136,41 +133,52 @@ public class JavaFXTemplate extends Application {
 						tempIndex = myInterface.puzzle[index];
 						myInterface.puzzle[index] = myInterface.puzzle[downIndex]; 
 						myInterface.puzzle[downIndex] = tempIndex;
-						button.setText(Integer.toString(button.puzzleVal));
+						//b.setText(Integer.toString(b.puzzleVal));
+						//System.out.println(+index);
 						// Print statements to help debug
 						System.out.println("Down");
 						System.out.println(myInterface.puzzle[downIndex]);
+						System.out.println("Row: " +b.row+" Col: "+b.col+" Value: "+b.puzzleVal+" Index: "+index);
 						System.out.println();
+						updateBoard(myInterface.puzzle, b);
 					}
 					else if((rightIndex < 16 && rightIndex >= 0) && myInterface.puzzle[rightIndex] == 0) {
 						tempIndex = myInterface.puzzle[index];
 						myInterface.puzzle[index] = myInterface.puzzle[rightIndex]; 
 						myInterface.puzzle[rightIndex] = tempIndex;
-						button.setText(Integer.toString(button.puzzleVal));
+						//b.setText(Integer.toString(b.puzzleVal));
+						
 						// Print statements to help debug
 						System.out.println("Right");
 						System.out.println(myInterface.puzzle[rightIndex]);
+						System.out.println("Row: " +b.row+" Col: "+b.col+" Value: "+b.puzzleVal+" Index: "+index);
 						System.out.println();
+						updateBoard(myInterface.puzzle, b);
 					}
 					else if((upIndex < 16 && upIndex >= 0) && myInterface.puzzle[upIndex] == 0) {
 						tempIndex = myInterface.puzzle[index];
 						myInterface.puzzle[index] = myInterface.puzzle[upIndex]; 
 						myInterface.puzzle[upIndex] = tempIndex;
-						button.setText(Integer.toString(button.puzzleVal));
+						//b.setText(Integer.toString(b.puzzleVal));
 						// Print statements to help debug
 						System.out.println("Up");
 						System.out.println(myInterface.puzzle[upIndex]);
+						System.out.println("Row: " +b.row+" Col: "+b.col+" Value: "+b.puzzleVal+" Index: "+index);
 						System.out.println();
+						updateBoard(myInterface.puzzle, b);
+
 					}
 					else if((leftIndex < 16 && leftIndex >= 0) && myInterface.puzzle[leftIndex] == 0) {
 						tempIndex = myInterface.puzzle[index];
 						myInterface.puzzle[index] = myInterface.puzzle[leftIndex]; 
 						myInterface.puzzle[leftIndex] = tempIndex;
-						button.setText(Integer.toString(button.puzzleVal));
+						//b.setText(Integer.toString(b.puzzleVal));
 						// Print statements to help debug
 						System.out.println("Left");
 						System.out.println(myInterface.puzzle[leftIndex]);
+						System.out.println("Row: " +b.row+" Col: "+b.col+" Value: "+b.puzzleVal+" Index: "+index);
 						System.out.println();
+						updateBoard(myInterface.puzzle, b);
 					}
 					else {
 						System.out.println("Invalid move");
@@ -182,17 +190,6 @@ public class JavaFXTemplate extends Application {
 	    		gameboard.add(button, col, row);
 			}
 		}
-//		for(i = 0; i < myInterface.puzzle.length; i++) {
-//			if(myInterface.puzzle[i] == 0) {
-//				index = i;
-//			}
-//		}
-//		leftIndex = index - 1;
-//		rightIndex = index + 1;
-//		upIndex = index - 4;
-//		downIndex = index + 4;
-
-		//System.out.println(+upIndex+" "+downIndex+" "+leftIndex+" "+rightIndex);
 		
 		// Solves the puzzle through A_Star algorithm
 		A_StarBtn.setOnAction(e->{
@@ -221,5 +218,131 @@ public class JavaFXTemplate extends Application {
 		
 		return new Scene(startPane, 800, 800);
 	}
+	
+	public void updateBoard(int[] _Values, GameButton button) {
+		// Reset everything and create new gameboard with updated array
+		gameboard.getChildren().clear();
+		i = 0;
+		for(int row = 0; row < 4; row++) {
+			for(int col = 0; col < 4; col++) {	
+				//Assign the buttons based on their respective rows, columns, and values
+				button = new GameButton(col, row, myInterface.puzzle[i]);
+				
+				//Make puzzle 0 white while the rest is colored
+				if(myInterface.puzzle[i] == 0) {
+					button.setStyle("-fx-background-color: white");
+					button.setText(" ");
+				}
+				else {
+					button.setStyle("-fx-background-color: magenta");
+					button.setText(Integer.toString(button.puzzleVal));
+				}
+				
+				i++;
+				button.setOnAction(e->{
+					// b carries the current GameButton object being clicked
+					GameButton b = (GameButton) e.getSource();
+					
+					//Assign indexes
+					int index = (4*b.row)+b.col;
+					int leftIndex = index - 1;
+					int rightIndex = index + 1;
+					int upIndex = index - 4;
+					int downIndex = index + 4;
+					int tempIndex = 0;
+					
+					// Check each direction to see if the adjacent value is 0 upon being clicked and 
+					// swap the values and update the gameboard if one of the conditions satisfy
+					if((downIndex < 16 && downIndex >= 0) && myInterface.puzzle[downIndex] == 0) {
+						tempIndex = myInterface.puzzle[index];
+						myInterface.puzzle[index] = myInterface.puzzle[downIndex]; 
+						myInterface.puzzle[downIndex] = tempIndex;
+						//b.setText(Integer.toString(b.puzzleVal));
+						//System.out.println(+index);
+						// Print statements to help debug
+						System.out.println("Down");
+						System.out.println(myInterface.puzzle[downIndex]);
+						System.out.println("Row: " +b.row+" Col: "+b.col+" Value: "+b.puzzleVal+" Index: "+index);
+						System.out.println();
+						updateBoard(myInterface.puzzle, b);
+					}
+					else if((rightIndex < 16 && rightIndex >= 0) && myInterface.puzzle[rightIndex] == 0) {
+						tempIndex = myInterface.puzzle[index];
+						myInterface.puzzle[index] = myInterface.puzzle[rightIndex]; 
+						myInterface.puzzle[rightIndex] = tempIndex;
+						//b.setText(Integer.toString(b.puzzleVal));
+						
+						// Print statements to help debug
+						System.out.println("Right");
+						System.out.println(myInterface.puzzle[rightIndex]);
+						System.out.println("Row: " +b.row+" Col: "+b.col+" Value: "+b.puzzleVal+" Index: "+index);
+						System.out.println();
+						updateBoard(myInterface.puzzle, b);
+					}
+					else if((upIndex < 16 && upIndex >= 0) && myInterface.puzzle[upIndex] == 0) {
+						tempIndex = myInterface.puzzle[index];
+						myInterface.puzzle[index] = myInterface.puzzle[upIndex]; 
+						myInterface.puzzle[upIndex] = tempIndex;
+						//b.setText(Integer.toString(b.puzzleVal));
+						// Print statements to help debug
+						System.out.println("Up");
+						System.out.println(myInterface.puzzle[upIndex]);
+						System.out.println("Row: " +b.row+" Col: "+b.col+" Value: "+b.puzzleVal+" Index: "+index);
+						System.out.println();
+						updateBoard(myInterface.puzzle, b);
 
+					}
+					else if((leftIndex < 16 && leftIndex >= 0) && myInterface.puzzle[leftIndex] == 0) {
+						tempIndex = myInterface.puzzle[index];
+						myInterface.puzzle[index] = myInterface.puzzle[leftIndex]; 
+						myInterface.puzzle[leftIndex] = tempIndex;
+						//b.setText(Integer.toString(b.puzzleVal));
+						// Print statements to help debug
+						System.out.println("Left");
+						System.out.println(myInterface.puzzle[leftIndex]);
+						System.out.println("Row: " +b.row+" Col: "+b.col+" Value: "+b.puzzleVal+" Index: "+index);
+						System.out.println();
+						updateBoard(myInterface.puzzle, b);
+					}
+					else {
+						System.out.println("Invalid move");
+					}
+					// Prints the array from the UserInterface object to help debug
+					myInterface.printArray();
+				});
+	    		button.setPrefSize(70, 70);
+	    		gameboard.add(button, col, row);
+			}
+		}
+	}
 }
+
+
+
+
+/*btnHandler = new EventHandler<ActionEvent>() {
+
+public void handle(ActionEvent e) {
+
+	GameButton btnPressed = (GameButton)e.getSource();
+
+	seeSolution.setDisable(true);
+
+	int[] tempArray = puzzle.userMove(puzzleArray, btnPressed);
+
+
+
+	if (tempArray != null) {
+
+swapButtons(btnPressed);				// swaps the buttons on the grid
+
+		puzzleArray = tempArray;				// updates the puzzleArray
+
+//startState = new Node (puzzleArray);	// updates the startState node
+
+		puzzle.startState = new Node(puzzleArray);
+
+grid.getChildren().clear();				// clears the grid
+
+addGrid(grid, puzzleArray);				// updates the grid with the new state
+*/
